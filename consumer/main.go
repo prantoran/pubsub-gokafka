@@ -18,12 +18,9 @@ import (
 const (
 	// zookeeperConn = "10.4.1.29:2181"
 	zookeeperConn = "192.168.4.93:2181"
-	senz_topic    = "senz"
-	renz_topic    = "renz"
 )
 
-func main() {
-
+func parseFlags() {
 	flag.String("topics", "senz", "help message for flagname")
 	flag.String("cg", "zgroup", "Consumer group for the client")
 
@@ -31,15 +28,23 @@ func main() {
 	pflag.Parse()
 	viper.BindPFlags(pflag.CommandLine)
 
+}
+
+func getTopics() []string {
+	tf := viper.GetString("topics")
+	return strings.Split(tf, ",")
+}
+
+func main() {
+	parseFlags()
+
 	cgName := viper.GetString("cg")
 	fmt.Println("cgName:", cgName)
 
-	tf := viper.GetString("topics")
-	topics := strings.Split(tf, ",")
-	fmt.Println("tf:", tf, " topics:", topics)
+	topics := getTopics()
 
 	for i, u := range topics {
-		fmt.Println("i:", i, " u:", u)
+		fmt.Println("topic[", i, "]: ", u)
 	}
 
 	// setup sarama log to stdout
