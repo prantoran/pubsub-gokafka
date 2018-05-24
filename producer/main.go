@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/Shopify/sarama"
 )
 
 const (
 	kafkaConn = "192.168.4.93:9092"
-	topic     = "senz"
 )
 
 func main() {
@@ -27,9 +27,23 @@ func main() {
 	for {
 		fmt.Print("Enter msg: ")
 		msg, _ := reader.ReadString('\n')
+		fmt.Printf("msg: %v type: %T \n", msg, msg)
+		words := strings.Split(msg, " ")
+		msg = ""
 
+		for i, u := range words {
+			fmt.Println("i:", i, " u:", u)
+			if i == 0 {
+				continue
+			}
+			msg += u
+		}
+
+		fmt.Println("upd msg:", msg)
+		topics := strings.Split(words[0], ",")
+		fmt.Println("topics:", topics)
 		// publish without goroutene
-		publish(msg, producer)
+		publish(&topics, msg, producer)
 
 		// publish with go routene
 		// go publish(msg, producer)
@@ -56,20 +70,26 @@ func initProducer() (sarama.SyncProducer, error) {
 	return prd, err
 }
 
-func publish(message string, producer sarama.SyncProducer) {
+func publish(topics *[]string, message string, producer sarama.SyncProducer) {
 	// publish sync
-	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.StringEncoder(message),
-	}
-	p, o, err := producer.SendMessage(msg)
-	if err != nil {
-		fmt.Println("Error publish: ", err.Error())
+
+	for _, topic := range *topics {
+		msg := &sarama.ProducerMessage{
+			Topic: topic,
+			Value: sarama.StringEncoder(message),
+		}
+
+		fmt.Println("topic:", topic, " msg:", msg)
+		p, o, err := producer.SendMessage(msg)
+		if err != nil {
+			fmt.Println("Error publish: ", err.Error())
+		}
+
+		// publish async
+		//producer.Input() <- &sarama.ProducerMessage{
+
+		fmt.Println("Partition: ", p)
+		fmt.Println("Offset: ", o)
 	}
 
-	// publish async
-	//producer.Input() <- &sarama.ProducerMessage{
-
-	fmt.Println("Partition: ", p)
-	fmt.Println("Offset: ", o)
 }
