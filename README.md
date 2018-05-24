@@ -10,11 +10,16 @@ Kafka uses Zookeeper to mange following tasks
 * Access control - Who is allowed to read and write to which topic (old high level consumer). Which consumer groups exist, who are their members and what is the latest offset each group got from each partition.
 
 
+KAFKA_ADVERTISED_HOST_NAME is the IP address of the machine(my local machine) which Kafka container running. ZOOKEEPER_IP is the Zookeeper container running machines IP. By this way producers and consumers can access Kafka and Zookeeper by using that IP address.
+
 #### Steps
-* Running Zookeeper
-`docker run -d --name zookeeper -p 2181:2181 jplock/zookeeper`
-* Running Kafka
-`docker run -d --name kafka -p 7203:7203 -p 9092:9092 -e KAFKA_ADVERTISED_HOST_NAME=10.4.1.29 -e ZOOKEEPER_IP=10.4.1.29 ches/kafka`
+* Run Zookeeper and Kafka
+
+`docker-compose up`
+
+* Create topic
+
+`docker run --rm ches/kafka kafka-topics.sh --create --topic senz --replication-factor 1 --partitions 1 --zookeeper 192.168.4.93:2181`
 
 
 * Tutorials:

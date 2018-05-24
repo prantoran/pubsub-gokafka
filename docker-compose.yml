@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  zookeeper:
+    image: confluent/zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      zk_id: "1"
+    networks:
+      - back-tier
+
+  kafka:
+    image: confluent/kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.4.93
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+    ports:
+      - "192.168.4.93:9092:9092"
+    networks:
+      - back-tier
+      
+networks:
+  back-tier:
