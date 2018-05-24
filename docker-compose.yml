@@ -15,10 +15,14 @@ services:
     depends_on:
       - zookeeper
     environment:
+      # setting KAFKA_ADVERTISED_HOST_NAME is important if not running
+      # in same host, i.e. services running in docker are treated
+      # as running in different hosts
       KAFKA_ADVERTISED_HOST_NAME: 192.168.4.93
+      # KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
     ports:
-      - "192.168.4.93:9092:9092"
+      - "9092:9092"
     networks:
       - back-tier
       
