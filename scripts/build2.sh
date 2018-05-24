@@ -1,0 +1,1 @@
+docker run --rm ches/kafka kafka-console-consumer.sh --bootstrap-server 192.168.4.93:9092 --topic senz --from-beginning

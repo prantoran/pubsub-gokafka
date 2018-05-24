@@ -1,0 +1,1 @@
+docker run --rm ches/kafka kafka-topics.sh --list --zookeeper 192.168.4.93:2181
