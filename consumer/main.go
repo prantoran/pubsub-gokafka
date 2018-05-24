@@ -18,7 +18,6 @@ import (
 const (
 	// zookeeperConn = "10.4.1.29:2181"
 	zookeeperConn = "192.168.4.93:2181"
-	cgroup        = "zgroup"
 	senz_topic    = "senz"
 	renz_topic    = "renz"
 )
@@ -26,10 +25,14 @@ const (
 func main() {
 
 	flag.String("topics", "senz", "help message for flagname")
+	flag.String("cg", "zgroup", "Consumer group for the client")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
 	viper.BindPFlags(pflag.CommandLine)
+
+	cgName := viper.GetString("cg")
+	fmt.Println("cgName:", cgName)
 
 	tf := viper.GetString("topics")
 	topics := strings.Split(tf, ",")
@@ -43,7 +46,7 @@ func main() {
 	sarama.Logger = log.New(os.Stdout, "", log.Ltime)
 
 	// init consumer croup
-	cg, err := initConsumer(&topics)
+	cg, err := initConsumer(&topics, cgName)
 	if err != nil {
 		fmt.Println("Error consumer goup: ", err.Error())
 		os.Exit(1)
@@ -54,7 +57,7 @@ func main() {
 	consume(cg)
 }
 
-func initConsumer(topics *[]string) (*consumergroup.ConsumerGroup, error) {
+func initConsumer(topics *[]string, cgroup string) (*consumergroup.ConsumerGroup, error) {
 	// consumer config
 	config := consumergroup.NewConfig()
 	config.Offsets.Initial = sarama.OffsetOldest
@@ -76,11 +79,14 @@ func consume(cg *consumergroup.ConsumerGroup) {
 			// messages coming through chanel
 			// only take messages from subscribed topic
 
-			if msg.Topic != senz_topic {
-				continue
-			}
-
-			fmt.Println("Topic: ", msg.Topic)
+			fmt.Println("msg\ntopic:", msg.Topic,
+				"\nkey:", string(msg.Key),
+				"\nval:", string(msg.Value),
+				"\noffset:", msg.Offset,
+				"\npartition:", msg.Partition,
+				"\ntimestamp:", msg.Timestamp,
+				"\nblocktimestamp:", msg.BlockTimestamp,
+				"\nheaders:", msg.Headers)
 			fmt.Println("Value: ", string(msg.Value))
 
 			// commit to zookeeper that message is read
