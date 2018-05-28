@@ -93,7 +93,15 @@ Topic:senz	PartitionCount:2	ReplicationFactor:1	Configs:
 - For now, first create topic using Zookeeper before registering consumer groups.
 - Zookeeper used to create topics
 - Kafka used by producer, consumer
-
+- kafka removes offests after they expire
+- Kafka broker shuts down after being idle
+- Things to consider for launching many kafka brokers
+```
+config/server-1.properties:
+    broker.id=1
+    listeners=PLAINTEXT://:9093
+    log.dir=/tmp/kafka-logs-1
+```
 
 * Tutorials:
 
@@ -104,3 +112,7 @@ Topic:senz	PartitionCount:2	ReplicationFactor:1	Configs:
 [Kafka producer](https://medium.com/@itseranga/kafka-producer-with-golang-fab7348a5f9a)
 
 [Confluent Docker Quickstart](https://docs.confluent.io/current/installation/docker/docs/quickstart.html)
+
+[Writing n testing event sourcing microservice in kafka and go](https://semaphoreci.com/community/tutorials/writing-and-testing-an-event-sourcing-microservice-with-kafka-and-go)
+
+[Dockerfiles for multiple kafka brokers](https://github.com/simplesteph/kafka-stack-docker-compose)

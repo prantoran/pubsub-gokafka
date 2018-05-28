@@ -52,7 +52,10 @@ func main() {
 
 func initProducer() (sarama.SyncProducer, error) {
 	// setup sarama log to stdout
-	sarama.Logger = log.New(os.Stdout, "", log.Ltime)
+	// sarama.Logger = log.New(os.Stdout, "", log.Ltime)
+
+	// for verbose logger
+	sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
 
 	// producer config
 	config := sarama.NewConfig()

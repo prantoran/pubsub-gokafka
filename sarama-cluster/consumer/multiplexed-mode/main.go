@@ -14,10 +14,11 @@ func main() {
 	// init (custom) config, enable errors and notifications
 	config := cluster.NewConfig()
 	config.Consumer.Return.Errors = true
+	// req to activate msg.Error() chan
 	config.Group.Return.Notifications = true
 
 	// init consumer
-	brokers := []string{"192.168.4.93:9092"}
+	brokers := []string{"192.168.4.93:9092"} // kafka urls
 	topics := []string{"senz", "renz"}
 	consumer, err := cluster.NewConsumer(brokers, "c1", topics, config)
 	if err != nil {
@@ -46,10 +47,31 @@ func main() {
 	// consume messages, watch signals
 	for {
 		select {
+
 		case msg, ok := <-consumer.Messages():
+			// This channel will only return if Config.Group.Mode option is set to
+			// ConsumerModeMultiplex (default).
 			if ok {
-				fmt.Fprintf(os.Stdout, "%s/%d/%d\t%s\t%s\n", msg.Topic, msg.Partition, msg.Offset, msg.Key, msg.Value)
+
+				fmt.Fprintf(os.Stdout, "%s/%d/%d\t%s\t%s timestamp: %v\nheaders: %v\n",
+					msg.Topic, msg.Partition, msg.Offset, msg.Key, msg.Value, msg.Timestamp, msg.Headers)
+
+				hwm := consumer.HighWaterMarks()
+
+				for k, v := range hwm {
+					fmt.Println("\tk:", k, " v:", v)
+				}
+
 				consumer.MarkOffset(msg, "") // mark message as processed
+
+				// Please be aware that calling this function during an internal rebalance cycle may return
+				// broker errors (e.g. sarama.ErrUnknownMemberId or sarama.ErrIllegalGeneration).
+				// consumer.CommitOffsets()
+
+			}
+		case err, ok := <-consumer.Errors():
+			if ok {
+				log.Println("err:", err)
 			}
 		case <-signals:
 			return
