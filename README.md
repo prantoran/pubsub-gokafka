@@ -33,11 +33,31 @@ Consumers in a consumer group load balance record processing.
 
 * Create topic
 
-`docker run --rm ches/kafka kafka-topics.sh --create --zookeeper 192.168.4.93:2181 --replication-factor 1 --partitions 1 --topic senz`
+`docker-compose exec kafka kafka-topics --create --topic senz --partitions 2 --replication-factor 1 --if-not-exists --zookeeper 192.168.4.93:2181`
+
+
+`docker-compose exec kafka kafka-topics --create --topic renz --partitions 3 --replication-factor 1 --if-not-exists --zookeeper 192.168.4.93:2181`
 
 * List topics
 
 `docker run --rm ches/kafka kafka-topics.sh --list --zookeeper 192.168.4.93:2181`
+
+* Get details about a specific topic
+`docker-compose exec kafka kafka-topics --describe --topic senz --zookeeper 192.168.4.93:2181`
+
+```
+Topic:senz	PartitionCount:2	ReplicationFactor:1	Configs:
+	Topic: senz	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+	Topic: senz	Partition: 1	Leader: 0	Replicas: 0	Isr: 0
+```
+
+* Publish from terminal
+
+`docker-compose exec kafka  bash -c "seq 42 | kafka-console-producer --request-required-acks 1 --broker-list 192.168.4.93:9092 --topic senz && echo 'Produced 42 messages.'"`
+
+* read message from terminal
+
+`docker-compose exec kafka kafka-console-consumer --zookeeper 192.168.4.93:2181 --bootstrap-server 192.168.4.93:9092 --topic senz --from-beginning --max-messages 42`
 
 * Create publisher
 
@@ -50,8 +70,22 @@ Consumers in a consumer group load balance record processing.
 <!-- `docker run --rm ches/kafka kafka-console-consumer.sh --topic senz --from-beginning --zookeeper 192.168.4.93:2181` -->
 `docker run --rm ches/kafka kafka-console-consumer.sh --bootstrap-server 192.168.4.93:9092 --topic senz --from-beginning`
 
+* consumers
+`go run main.go --group=c1 --topics=senz --zookeeper=192.168.4.93:2181`
+
+
+* Check the ZooKeeper logs to verify that ZooKeeper is healthy.
+`docker-compose logs zookeeper | grep -i binding`
+
+* Check the Kafka logs to verify that broker is healthy.
+`docker-compose logs kafka | grep -i started`
+
+
 ##### Nuances
 - set `KAFKA_ADVERTISED_HOST_NAME` in `docker-compose.yml` if producer cannot publish.
+- For now, first create topic using Zookeeper before registering consumer groups.
+- Zookeeper used to create topics
+- Kafka used by producer, consumer
 
 
 * Tutorials:
@@ -59,3 +93,4 @@ Consumers in a consumer group load balance record processing.
 [Kafka and Zookeeper with Docker](https://medium.com/@itseranga/kafka-and-zookeeper-with-docker-65cff2c2c34f)
 [Kafka consumer](https://medium.com/@itseranga/kafka-consumer-with-golang-a93db6131ac2)
 [Kafka producer](https://medium.com/@itseranga/kafka-producer-with-golang-fab7348a5f9a)
+[Confluent Docker Quickstart](https://docs.confluent.io/current/installation/docker/docs/quickstart.html)
