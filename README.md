@@ -23,6 +23,9 @@ Consumers in a consumer group load balance record processing.
 
 #### Steps
 
+
+##### Starting Kafka and Zookeeper
+
 * To check which IP addresses to use
 
 `ifconfig | grep inet`
@@ -30,6 +33,14 @@ Consumers in a consumer group load balance record processing.
 * Run Zookeeper and Kafka
 
 `docker-compose up`
+
+* Check the ZooKeeper logs to verify that ZooKeeper is healthy.
+`docker-compose logs zookeeper | grep -i binding`
+
+* Check the Kafka logs to verify that broker is healthy.
+`docker-compose logs kafka | grep -i started`
+
+##### Creating topic, publish and consumer messages from the terminal
 
 * Create topic
 
@@ -70,15 +81,11 @@ Topic:senz	PartitionCount:2	ReplicationFactor:1	Configs:
 <!-- `docker run --rm ches/kafka kafka-console-consumer.sh --topic senz --from-beginning --zookeeper 192.168.4.93:2181` -->
 `docker run --rm ches/kafka kafka-console-consumer.sh --bootstrap-server 192.168.4.93:9092 --topic senz --from-beginning`
 
-* consumers
+
+##### Running consumers
+
+* wvanbergen consumers
 `go run main.go --group=c1 --topics=senz --zookeeper=192.168.4.93:2181`
-
-
-* Check the ZooKeeper logs to verify that ZooKeeper is healthy.
-`docker-compose logs zookeeper | grep -i binding`
-
-* Check the Kafka logs to verify that broker is healthy.
-`docker-compose logs kafka | grep -i started`
 
 
 ##### Nuances
