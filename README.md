@@ -91,6 +91,9 @@ Topic:senz	PartitionCount:2	ReplicationFactor:1	Configs:
 * Tutorials:
 
 [Kafka and Zookeeper with Docker](https://medium.com/@itseranga/kafka-and-zookeeper-with-docker-65cff2c2c34f)
+
 [Kafka consumer](https://medium.com/@itseranga/kafka-consumer-with-golang-a93db6131ac2)
+
 [Kafka producer](https://medium.com/@itseranga/kafka-producer-with-golang-fab7348a5f9a)
+
 [Confluent Docker Quickstart](https://docs.confluent.io/current/installation/docker/docs/quickstart.html)
