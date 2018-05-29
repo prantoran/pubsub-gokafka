@@ -6,6 +6,7 @@ import (
 	"os/signal"
 
 	cluster "github.com/bsm/sarama-cluster"
+	"github.com/prantoran/pubsub-gokafka/conf"
 )
 
 func main() {
@@ -15,9 +16,8 @@ func main() {
 	config.Group.Mode = cluster.ConsumerModePartitions
 
 	// init consumer
-	brokers := []string{"192.168.4.93:9092"}
 	topics := []string{"senz", "renz"}
-	consumer, err := cluster.NewConsumer(brokers, "my-consumer-group", topics, config)
+	consumer, err := cluster.NewConsumer(conf.AllBrokers(), "my-consumer-group", topics, config)
 	if err != nil {
 		panic(err)
 	}
