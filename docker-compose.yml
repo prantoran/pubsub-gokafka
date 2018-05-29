@@ -1,14 +1,22 @@
 version: "3"
 
 services:
+
   zookeeper:
-    image: confluent/zookeeper
+    image: zookeeper
+    hostname: zookeeper
     ports:
       - "2181:2181"
     environment:
-      zk_id: "1"
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+      ZOO_SERVERS: server.1=zookeeper:2888:3888
+      # zk_id: "1"
     networks:
       - back-tier
+    volumes:
+      - ./zk-single-kafka-multiple/zoo1/data:/data
+      - ./zk-single-kafka-multiple/zoo1/datalog:/datalog
 
   # kafka:
   #   image: confluent/kafka
@@ -25,9 +33,9 @@ services:
   #     - "9092:9092"
   #   networks:
   #     - back-tier
-  
+
   kafka1:
-    image: confluent/kafka
+    image: confluentinc/cp-kafka
     hostname: kafka1
     ports:
       - "9092:9092"
@@ -38,35 +46,64 @@ services:
       # KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka1:9092"
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://192.168.4.93:9092"
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      # KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_BROKER_ID: 1
       KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
     # volumes:
     #   - ./multikafkabrokers/kafka1/data:/var/lib/kafka/data
+    # links:
+    #   - zookeeper:zookeeper
     depends_on:
       - zookeeper
     networks:
       - back-tier
 
-  # kafka2:
-  #   image: confluent/kafka
-  #   hostname: kafka2
-  #   ports:
-  #     - "9093:9093"
-  #   environment:
-  #     KAFKA_ADVERTISED_HOST_NAME: 192.168.4.93
-  #     # KAFKA_ADVERTISED_PORT: 9092
-  #     # add the entry "127.0.0.1    kafka1" to your /etc/hosts file
-  #     KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka2:9093"
-  #     KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-  #     KAFKA_BROKER_ID: 2
-  #     KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
-  #   volumes:
-  #     - ./multikafkabrokers/kafka2/data:/var/lib/kafka/data
-  #   depends_on:
-  #     - zookeeper
-  #   networks:
-  #     - back-tier
+  kafka2:
+    image: confluentinc/cp-kafka
+    hostname: kafka2
+    ports:
+      - "9093:9093"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.4.93
+      # KAFKA_ADVERTISED_PORT: 9092
+      # add the entry "127.0.0.1    kafka1" to your /etc/hosts file
+      # KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka1:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://192.168.4.93:9093"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 2
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+    # volumes:
+    #   - ./multikafkabrokers/kafka1/data:/var/lib/kafka/data
+    # links:
+    #   - zookeeper:zookeeper
+    depends_on:
+      - zookeeper
+    networks:
+      - back-tier
 
+
+  kafka3:
+    image: confluentinc/cp-kafka
+    hostname: kafka3
+    ports:
+      - "9094:9094"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.4.93
+      # KAFKA_ADVERTISED_PORT: 9092
+      # add the entry "127.0.0.1    kafka1" to your /etc/hosts file
+      # KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka1:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://192.168.4.93:9094"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 3
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+    # volumes:
+    #   - ./multikafkabrokers/kafka1/data:/var/lib/kafka/data
+    # links:
+    #   - zookeeper:zookeeper
+    depends_on:
+      - zookeeper
+    networks:
+      - back-tier
       
 networks:
   back-tier:
