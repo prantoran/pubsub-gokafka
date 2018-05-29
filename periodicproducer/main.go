@@ -8,10 +8,7 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-)
-
-const (
-	kafkaConn = "192.168.4.93:9092"
+	"github.com/prantoran/pubsub-gokafka/conf"
 )
 
 var curPartion = map[string]int32{}
@@ -50,7 +47,7 @@ func initProducer() (sarama.SyncProducer, error) {
 	//prd, err := sarama.NewAsyncProducer([]string{kafkaConn}, config)
 
 	// sync producer
-	prd, err := sarama.NewSyncProducer([]string{kafkaConn}, config)
+	prd, err := sarama.NewSyncProducer(conf.AllBrokers(), config)
 
 	return prd, err
 }

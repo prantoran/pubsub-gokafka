@@ -7,6 +7,7 @@ import (
 	"os/signal"
 
 	cluster "github.com/bsm/sarama-cluster"
+	"github.com/prantoran/pubsub-gokafka/conf"
 )
 
 func main() {
@@ -18,9 +19,8 @@ func main() {
 	config.Group.Return.Notifications = true
 
 	// init consumer
-	brokers := []string{"192.168.4.93:9092"} // kafka urls
 	topics := []string{"senz", "renz"}
-	consumer, err := cluster.NewConsumer(brokers, "c1", topics, config)
+	consumer, err := cluster.NewConsumer(conf.AllBrokers(), "c1", topics, config)
 	if err != nil {
 		panic(err)
 	}
