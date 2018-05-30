@@ -8,6 +8,7 @@ import (
 	"os/signal"
 
 	cluster "github.com/bsm/sarama-cluster"
+	"github.com/prantoran/pubsub-gokafka/api"
 	"github.com/prantoran/pubsub-gokafka/data"
 
 	"github.com/prantoran/pubsub-gokafka/conf"
@@ -75,7 +76,15 @@ func main() {
 					fmt.Println("\tk:", k, " v:", v)
 				}
 
-				consumer.MarkOffset(msg, "") // mark message as processed
+				producer, err := api.InitProducer(1, "multiplexed_consumer")
+				d.RetryCount++
+				if d.RetryCount > 5 {
+					fmt.Println("max retry count reached")
+					continue
+				}
+				if err := api.Publish(&[]string{msg.Topic}, &d, producer); err != nil {
+					log.Println("could not publish: ", err)
+				} // consumer.MarkOffset(msg, "") // mark message as processed
 
 				// Please be aware that calling this function during an internal rebalance cycle may return
 				// broker errors (e.g. sarama.ErrUnknownMemberId or sarama.ErrIllegalGeneration).
