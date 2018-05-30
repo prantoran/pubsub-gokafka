@@ -14,9 +14,9 @@ services:
       # zk_id: "1"
     networks:
       - back-tier
-    volumes:
-      - ./zk-single-kafka-multiple/zoo1/data:/data
-      - ./zk-single-kafka-multiple/zoo1/datalog:/datalog
+    # volumes:
+    #   - ./zk-single-kafka-multiple/zoo1/data:/data
+    #   - ./zk-single-kafka-multiple/zoo1/datalog:/datalog
 
   # kafka:
   #   image: confluent/kafka
