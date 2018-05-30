@@ -1,12 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
 
 	cluster "github.com/bsm/sarama-cluster"
+	"github.com/prantoran/pubsub-gokafka/data"
+
 	"github.com/prantoran/pubsub-gokafka/conf"
 )
 
@@ -20,7 +23,7 @@ func main() {
 
 	// init consumer
 	topics := []string{"senz", "renz"}
-	consumer, err := cluster.NewConsumer(conf.AllBrokers(), "c1", topics, config)
+	consumer, err := cluster.NewConsumer(conf.AllBrokers(1), "c1", topics, config)
 	if err != nil {
 		panic(err)
 	}
@@ -55,6 +58,16 @@ func main() {
 
 				fmt.Fprintf(os.Stdout, "%s/%d/%d\t%s\t%s timestamp: %v\nheaders: %v\n",
 					msg.Topic, msg.Partition, msg.Offset, msg.Key, msg.Value, msg.Timestamp, msg.Headers)
+
+				d := data.KafkaMsg{}
+				err := json.Unmarshal(msg.Value, &d)
+
+				if err != nil {
+					fmt.Println("could not unmarshal msg.Value: ", err)
+					continue
+				}
+
+				fmt.Println("d data:", d.Data, " retrycnt:", d.RetryCount)
 
 				hwm := consumer.HighWaterMarks()
 
