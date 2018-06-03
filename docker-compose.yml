@@ -55,6 +55,8 @@ services:
     #   - zookeeper:zookeeper
     depends_on:
       - zookeeper
+        condition: service_healthy
+
     networks:
       - back-tier
 
@@ -78,6 +80,8 @@ services:
     #   - zookeeper:zookeeper
     depends_on:
       - zookeeper
+        condition: service_healthy
+
     networks:
       - back-tier
 
@@ -102,6 +106,7 @@ services:
     #   - zookeeper:zookeeper
     depends_on:
       - zookeeper
+        condition: service_healthy
     networks:
       - back-tier
       
